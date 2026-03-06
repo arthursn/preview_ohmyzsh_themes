@@ -1,7 +1,14 @@
 source "$ZDOTDIR/.zsh_theme"
+
+if [[ -f "$ZDOTDIR/.zsh_plugins" ]]; then
+    source "$ZDOTDIR/.zsh_plugins"
+fi
+
 source "$ZSH/oh-my-zsh.sh"
 
-source .venv/bin/activate &>/dev/null
+if [[ -f ".venv/bin/activate" ]]; then
+    source ".venv/bin/activate"
+fi
 
 # Function to handle Enter key
 function previous_theme() {

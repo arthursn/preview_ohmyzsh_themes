@@ -1,24 +1,17 @@
 #!/usr/bin/zsh
 
+zdotdir=$PWD/testing_environment
+zsh_theme_file="$zdotdir/.zsh_theme"
+zsh_plugins_file="$zdotdir/.zsh_plugins"
+
 # Default options
 reset=false
 help=false
 start_theme=""
+plugins=()
 
 # Parse command line arguments using getopt
-zparseopts -D -E -- r=reset_opt -reset=reset_opt h=help_opt -help=help_opt t:=theme_opt -theme:=theme_opt
-
-# Process options
-if (($#reset_opt > 0)); then
-    reset=true
-    # Remove the last theme file if it exists
-    [[ -f "$ZSH_THEME_FILE" ]] && rm "$ZSH_THEME_FILE"
-fi
-
-if (($#theme_opt > 0)); then
-    # Extract the theme name/index (it's the second element in the array)
-    start_theme="${theme_opt[2]}"
-fi
+zparseopts -D -E -- r=reset_opt -reset=reset_opt h=help_opt -help=help_opt t:=theme_opt -theme:=theme_opt p:=plugin_opt -plugin:=plugin_opt
 
 if (($#help_opt > 0)); then
     help=true
@@ -26,9 +19,32 @@ if (($#help_opt > 0)); then
     echo "Options:"
     echo "  -r, --reset                Start from the beginning instead of resuming"
     echo "  -t THEME, --theme THEME    Start with the specified theme (name or index number)"
+    echo "  -p PLUGIN, --plugin PLUGIN Activate the specified plugin (can be used multiple times)"
     echo "  -h, --help                 Display this help message"
     exit 0
 fi
+
+if (($#reset_opt > 0)); then
+    reset=true
+    # Remove the last theme file if it exists
+    [[ -f "$zsh_theme_file" ]] && rm "$zsh_theme_file"
+fi
+
+if (($#theme_opt > 0)); then
+    # Extract the theme name/index (it's the second element in the array)
+    start_theme="${theme_opt[2]}"
+fi
+
+# Process plugin options (can be specified multiple times)
+if (($#plugin_opt > 0)); then
+    # Extract plugins (every second element starting from position 2)
+    for ((i = 2; i <= $#plugin_opt; i += 2)); do
+        plugins+=(${plugin_opt[$i]})
+    done
+fi
+
+# Write plugins to file
+echo 'plugins=('"${plugins[@]}"')' >$zsh_plugins_file
 
 echo "Theme preview script"
 echo "Press Ctrl + [right arrow | left arrow] to navigate to the next or previous theme"
@@ -39,9 +55,6 @@ echo ""
 # Source zsh configuration to make omz available
 source "$HOME/.zshrc"
 
-ZDOTDIR=$PWD/testing_environment
-ZSH_THEME_FILE="$ZDOTDIR/.zsh_theme"
-
 # Get all available themes
 # Store themes in an array
 themes=($(omz theme list))
@@ -50,8 +63,8 @@ themes=($(omz theme list))
 start_index=1
 
 # Otherwise, try to resume from last theme if not resetting
-if ! [[ -n "$start_theme" ]] && [[ -f "$ZSH_THEME_FILE" ]] && ! $reset; then
-    source "$ZSH_THEME_FILE"
+if ! [[ -n "$start_theme" ]] && [[ -f "$zsh_theme_file" ]] && ! $reset; then
+    source "$zsh_theme_file"
     start_theme="$ZSH_THEME"
 fi
 
@@ -102,10 +115,11 @@ while true; do
 
     theme="${themes[$index]}"
     echo "Setting theme to: $theme ($index/${#themes[@]}) [← Previous | Next →]"
-    echo 'ZSH_THEME="'"$theme"'"' >$ZSH_THEME_FILE
+    echo 'ZSH_THEME="'"$theme"'"' >$zsh_theme_file
 
     # Start an interactive shell with our temporary zshrc
-    ZSH=$ZSH ZDOTDIR=$ZDOTDIR zsh -i
+    # ZSH was sourced from ~/.zshrc
+    ZSH=$ZSH ZDOTDIR=$zdotdir zsh -i
     exit_code=$?
 
     # Update index based on exit code
