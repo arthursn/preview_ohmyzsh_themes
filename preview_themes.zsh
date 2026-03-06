@@ -3,9 +3,6 @@
 # Source zsh configuration to make omz available
 source ~/.zshrc
 
-# Store the script's PID
-SCRIPT_PID=$$
-
 # File to store the last viewed theme
 LAST_THEME_FILE="$PWD/.last_theme"
 
