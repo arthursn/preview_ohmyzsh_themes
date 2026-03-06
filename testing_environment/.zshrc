@@ -1,6 +1,6 @@
 # Source original zshrc
 source $HOME/.zshrc
-source .venv/bin/activate
+source .venv/bin/activate &>/dev/null
 
 # Function to handle Enter key
 function previous_theme() {
