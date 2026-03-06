@@ -3,6 +3,9 @@
 # Source zsh configuration to make omz available
 source ~/.zshrc
 
+ZDOTDIR=$PWD/testing_environment
+ZSH_THEME_FILE="$ZDOTDIR/.zsh_theme"
+
 # Get all available themes
 # Store themes in an array
 themes=($(omz theme list))
@@ -11,6 +14,8 @@ themes=($(omz theme list))
 reset=false
 if [[ "$1" == "--reset" || "$1" == "-r" ]]; then
     reset=true
+    # Remove the last theme file if it exists
+    [[ -f "$ZSH_THEME_FILE" ]] && rm "$ZSH_THEME_FILE"
 fi
 
 echo "Theme preview script"
@@ -21,12 +26,12 @@ echo ""
 
 # Find starting index - note: zsh arrays are 1-indexed
 start_index=1
-if ! $reset; then
+if [[ -f "$ZSH_THEME_FILE" ]] && ! $reset; then
+    last_theme=$(cat "$ZSH_THEME_FILE")
     for i in {1..${#themes[@]}}; do
-        if [[ "${themes[$i]}" == "$ZSH_THEME" ]]; then
-            # Start from the next theme
+        if [[ "${themes[$i]}" == "$last_theme" ]]; then
             start_index=$i
-            echo "Resuming from theme: $ZSH_THEME"
+            echo "Resuming from theme: $last_theme"
             break
         fi
     done
@@ -48,10 +53,10 @@ while true; do
 
     theme="${themes[$i]}"
     echo "Setting theme to: $theme ($i/${#themes[@]}) [← Previous | Next →]"
-    omz theme set "$theme" &>/dev/null
+    echo 'ZSH_THEME="'"$theme"'"' >$ZSH_THEME_FILE
 
     # Start an interactive shell with our temporary zshrc
-    ZDOTDIR=$PWD/testing_environment zsh -i
+    zsh -i
     exit_code=$?
 
     # Update index based on exit code

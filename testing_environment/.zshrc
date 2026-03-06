@@ -1,5 +1,6 @@
-# Source original zshrc
-source $HOME/.zshrc
+source "$ZDOTDIR/.zsh_theme"
+source "$HOME/.oh-my-zsh/oh-my-zsh.sh"
+
 source .venv/bin/activate &>/dev/null
 
 # Function to handle Enter key
