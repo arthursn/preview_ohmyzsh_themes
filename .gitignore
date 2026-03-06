@@ -1,0 +1,4 @@
+.aider*
+testing_environment/*
+!testing_environment/.zshrc
+.last_theme
