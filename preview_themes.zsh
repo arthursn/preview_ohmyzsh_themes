@@ -27,11 +27,11 @@ echo ""
 # Find starting index - note: zsh arrays are 1-indexed
 start_index=1
 if [[ -f "$ZSH_THEME_FILE" ]] && ! $reset; then
-    last_theme=$(cat "$ZSH_THEME_FILE")
+    source "$ZSH_THEME_FILE"
     for i in {1..${#themes[@]}}; do
-        if [[ "${themes[$i]}" == "$last_theme" ]]; then
+        if [[ "${themes[$i]}" == "$ZSH_THEME" ]]; then
             start_index=$i
-            echo "Resuming from theme: $last_theme"
+            echo "Resuming from theme: $ZSH_THEME"
             break
         fi
     done
@@ -56,7 +56,7 @@ while true; do
     echo 'ZSH_THEME="'"$theme"'"' >$ZSH_THEME_FILE
 
     # Start an interactive shell with our temporary zshrc
-    zsh -i
+    ZDOTDIR=$ZDOTDIR zsh -i
     exit_code=$?
 
     # Update index based on exit code
