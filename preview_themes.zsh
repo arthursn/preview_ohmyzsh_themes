@@ -3,36 +3,30 @@
 # Source zsh configuration to make omz available
 source ~/.zshrc
 
-# File to store the last viewed theme
-LAST_THEME_FILE="$PWD/.last_theme"
-
 # Get all available themes
 # Store themes in an array
-themes=($(omz theme list | grep -v "Current theme\|Custom themes\|Built-in themes" | tr -s ' ' | grep -v '^$'))
+themes=($(omz theme list))
 
 # Parse command line arguments - resume by default, reset with option
 reset=false
 if [[ "$1" == "--reset" || "$1" == "-r" ]]; then
     reset=true
-    # Remove the last theme file if it exists
-    [[ -f "$LAST_THEME_FILE" ]] && rm "$LAST_THEME_FILE"
 fi
 
 echo "Theme preview script"
-echo "Press Enter to try the next theme"
+echo "Press Ctrl + [right arrow | left arrow] to navigate to the next or previous theme"
 echo "Press Ctrl+C to exit the entire script"
 echo "Use --reset or -r to start from the beginning"
 echo ""
 
-# Find starting index
-start_index=0
-if [[ -f "$LAST_THEME_FILE" ]] && ! $reset; then
-    last_theme=$(cat "$LAST_THEME_FILE")
+# Find starting index - note: zsh arrays are 1-indexed
+start_index=1
+if ! $reset; then
     for i in {1..${#themes[@]}}; do
-        if [[ "${themes[$i]}" == "$last_theme" ]]; then
+        if [[ "${themes[$i]}" == "$ZSH_THEME" ]]; then
             # Start from the next theme
-            start_index=$((i + 1))
-            echo "Resuming from theme: $last_theme"
+            start_index=$i
+            echo "Resuming from theme: $ZSH_THEME"
             break
         fi
     done
@@ -44,20 +38,17 @@ i=$start_index
 # Loop through themes using while true
 while true; do
     # Check if index is out of bounds
-    if [[ $i -lt 0 ]]; then
-        i=0
+    if [[ $i -lt 1 ]]; then
+        i=1
         echo "Already at the first theme."
-    elif [[ $i -ge ${#themes[@]} ]]; then
+    elif [[ $i -gt ${#themes[@]} ]]; then
         echo "Theme preview completed."
         break
     fi
 
     theme="${themes[$i]}"
-    echo "Setting theme to: $theme ($((i + 1))/${#themes[@]}) [← Previous | Next →]"
+    echo "Setting theme to: $theme ($i/${#themes[@]}) [← Previous | Next →]"
     omz theme set "$theme" &>/dev/null
-
-    # Save current theme to file
-    echo "$theme" >"$LAST_THEME_FILE"
 
     # Start an interactive shell with our temporary zshrc
     ZDOTDIR=$PWD/testing_environment zsh -i
