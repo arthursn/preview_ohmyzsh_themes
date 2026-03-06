@@ -22,11 +22,9 @@ setopt ignoreeof
 trap stop_preview INT
 # Create a ZLE widgets
 zle -N stop_preview_widget stop_preview
-zle -N handle_enter_widget next_theme
 zle -N next_theme_widget next_theme
 zle -N previous_theme_widget previous_theme
 
 bindkey '^D' stop_preview_widget
-bindkey '^M' handle_enter_widget
 bindkey '^[[1;5D' previous_theme_widget # Ctrl + Arrow Left
 bindkey '^[[1;5C' next_theme_widget     # Ctrl + Arrow Right
