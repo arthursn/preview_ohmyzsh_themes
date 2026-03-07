@@ -1,6 +1,20 @@
 #!/usr/bin/zsh
 
-zdotdir=$PWD/testing_environment
+# Get the real path of the script, following symlinks
+script_path="$0"
+while [ -L "$script_path" ]; do
+    # Get the target of the symlink
+    script_path="$(readlink "$script_path")"
+    # If the symlink was a relative path, make it absolute
+    if [[ ! "$script_path" = /* ]]; then
+        script_path="$(dirname "$0")/$script_path"
+    fi
+done
+
+# Get the directory containing the script
+script_dir="$(cd "$(dirname "$script_path")" && pwd)"
+
+zdotdir="$script_dir/testing_environment"
 zsh_theme_file="$zdotdir/.zsh_theme"
 zsh_plugins_file="$zdotdir/.zsh_plugins"
 
