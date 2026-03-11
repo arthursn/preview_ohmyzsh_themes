@@ -16,13 +16,13 @@ This tool allows you to quickly preview all available Oh My Zsh themes without h
 Simply download the script and make it executable:
 
 ```bash
-chmod +x preview_themes.zsh
+chmod +x preview_omz_themes.zsh
 ```
 
 You can also create a symlink to the script in a directory that's in your PATH for easier access:
 
 ```bash
-ln -s "$(pwd)/preview_themes.zsh" ~/.local/bin/preview-themes
+ln -s "$(pwd)/preview_omz_themes.zsh" ~/.local/bin/preview-themes
 ```
 
 ## Usage
@@ -30,7 +30,7 @@ ln -s "$(pwd)/preview_themes.zsh" ~/.local/bin/preview-themes
 Run the script:
 
 ```bash
-./preview_themes.zsh
+./preview_omz_themes.zsh
 ```
 
 ### Command-line Options
@@ -57,25 +57,25 @@ Your theme selection is saved in `~/.config/preview_ohmyzsh_themes/last_theme` s
 
 Start from the beginning:
 ```bash
-./preview_themes.zsh --reset
+./preview_omz_themes.zsh --reset
 ```
 
 Start with a specific theme:
 ```bash
-./preview_themes.zsh --theme robbyrussell
+./preview_omz_themes.zsh --theme robbyrussell
 ```
 
 Start with a specific theme index:
 ```bash
-./preview_themes.zsh --theme 5
+./preview_omz_themes.zsh --theme 5
 ```
 
 Enable plugins while previewing:
 ```bash
-./preview_themes.zsh --plugin git --plugin docker
+./preview_omz_themes.zsh --plugin git --plugin docker
 ```
 
 Try multiple options together:
 ```bash
-./preview_themes.zsh --theme agnoster --plugin git --plugin docker --plugin kubectl
+./preview_omz_themes.zsh --theme agnoster --plugin git --plugin docker --plugin kubectl
 ```
