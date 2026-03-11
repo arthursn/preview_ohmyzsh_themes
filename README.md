@@ -45,7 +45,7 @@ Run the script:
 While previewing themes:
 - `Ctrl + Right Arrow`: Move to the next theme
 - `Ctrl + Left Arrow`: Move to the previous theme
-- `Ctrl + C` or `Ctrl + D`: Exit the preview
+- `Ctrl + D`: Exit the preview
 
 ## How It Works
 

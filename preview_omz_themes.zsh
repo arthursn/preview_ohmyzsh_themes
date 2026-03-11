@@ -36,8 +36,6 @@ function stop_preview() {
 # Prevent Ctrl+D from immediately exiting the shell
 setopt ignoreeof
 
-# Set up trap for Ctrl+C
-trap stop_preview INT
 # Create ZLE widgets
 zle -N stop_preview_widget stop_preview
 zle -N next_theme_widget next_theme
