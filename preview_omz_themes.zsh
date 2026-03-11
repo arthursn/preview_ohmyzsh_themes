@@ -21,15 +21,15 @@ if [[ -f ".venv/bin/activate" ]]; then
 fi
 
 # Function to handle navigation
-function previous_theme() {
-    exit 2
+function prev() {
+    exit -\${1-1}
 }
 
-function next_theme() {
-    exit 1
+function next() {
+    exit \${1-1}
 }
 
-function stop_preview() {
+function stop() {
     exit 0
 }
 
@@ -37,13 +37,13 @@ function stop_preview() {
 setopt ignoreeof
 
 # Create ZLE widgets
-zle -N stop_preview_widget stop_preview
-zle -N next_theme_widget next_theme
-zle -N previous_theme_widget previous_theme
+zle -N stop_widget stop
+zle -N next_widget next
+zle -N prev_widget prev
 
-bindkey '^D' stop_preview_widget
-bindkey '^[[1;5D' previous_theme_widget # Ctrl + Arrow Left
-bindkey '^[[1;5C' next_theme_widget     # Ctrl + Arrow Right
+bindkey '^D' stop_widget
+bindkey '^[[1;5D' prev_widget # Ctrl + Arrow Left
+bindkey '^[[1;5C' next_widget # Ctrl + Arrow Right
 EOL
 }
 
@@ -70,7 +70,7 @@ preview_omz_themes() {
         echo "Options:"
         echo "  -r, --reset                Start from the beginning instead of resuming"
         echo "  -t THEME, --theme THEME    Start with the specified theme (name or index number)"
-        echo "  -p PLUGIN, --plugin PLUGIN Activate the specified plugin (can be used multiple times)"
+        echo "  -p PLUGIN, --plugin PLUGIN Activate the specified plugin(s)"
         echo "  -h, --help                 Display this help message"
         return 0
     fi
@@ -80,16 +80,14 @@ preview_omz_themes() {
     fi
 
     if (($#theme_opt > 0)); then
-        # Extract the theme name/index (it's the second element in the array)
+        # Extract the theme name/index (second element in the array)
         start_theme="${theme_opt[2]}"
     fi
 
     # Process plugin options (can be specified multiple times)
     if (($#plugin_opt > 0)); then
-        # Extract plugins (every second element starting from position 2)
-        for ((i = 2; i <= $#plugin_opt; i += 2)); do
-            preview_plugins+=(${plugin_opt[$i]})
-        done
+        # Extract plugins (second element in the array)
+        preview_plugins+=(${plugin_opt[2]})
     fi
 
     echo "Theme preview script"
@@ -179,16 +177,16 @@ preview_omz_themes() {
         local exit_code=$?
 
         # Update index based on exit code
-        if [[ $exit_code -eq 2 ]]; then
-            # Go back one theme
-            index=$((index - 1))
-        elif [[ $exit_code -eq 0 ]]; then
+        if (($exit_code == 0)); then
             # Exit code 0 means stop the preview
             echo "Theme preview stopped."
             break
+        elif (($exit_code > 128)); then
+            # Go back theme. This applies to exit -1, for example
+            index=$((index - (256 - $exit_code)))
         else
             # Any other exit code means continue to next theme
-            index=$((index + 1))
+            index=$((index + $exit_code))
         fi
     done
 
