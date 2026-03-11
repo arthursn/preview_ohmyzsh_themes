@@ -51,15 +51,7 @@ EOL
 
 # Function to preview Oh My Zsh themes
 preview_omz_themes() {
-    local temp_zdotdir="${1:-$(mktemp -d /tmp/zsh_theme_preview.XXXXXX)}"
-    local cleanup_temp_dir=false
-
-    # If no directory was provided, we created a temporary one that needs cleanup
-    if [[ "$1" == "" ]]; then
-        cleanup_temp_dir=true
-    fi
-
-    # Set up config directory for storing last theme
+    local temp_zdotdir="$(mktemp -d /tmp/zsh_theme_preview.XXXXXX)"
     local config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/preview_omz_themes"
     local last_theme_file="$config_dir/last_theme"
     local zsh_rc_file="$temp_zdotdir/.zshrc"
@@ -202,13 +194,13 @@ preview_omz_themes() {
         fi
     done
 
-    # Clean up temporary directory if we created it
-    if $cleanup_temp_dir; then
-        rm -rf "$temp_zdotdir"
-    fi
+    # Clean up temporary directory
+    rm -rf "$temp_zdotdir"
 
     return 0
 }
 
-# Call the preview_themes function with all arguments
-preview_omz_themes "$@"
+# Only execute the function if the script is run directly, not sourced
+if ! [[ $ZSH_EVAL_CONTEXT =~ :file$ ]]; then
+    preview_omz_themes "$@"
+fi
