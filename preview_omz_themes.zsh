@@ -22,11 +22,27 @@ fi
 
 # Function to handle navigation
 function prev() {
-    exit -\${1-1}
+    inc=\${1-1}
+    if ((inc == 0)); then
+        return
+    fi
+    if ((inc >= 128)) || ((inc < -128)); then
+        echo "Step must be between -128 to 127"
+        return
+    fi
+    exit \$((-(\$inc)))
 }
 
 function next() {
-    exit \${1-1}
+    inc=\${1-1}
+    if ((inc == 0)); then
+        return
+    fi
+    if ((inc > 128)) || ((inc <= -128)); then
+        echo "Step must in -127 to 128"
+        return
+    fi
+    exit inc
 }
 
 function stop() {
